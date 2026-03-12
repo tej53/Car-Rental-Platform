@@ -1,13 +1,21 @@
 import { use, useState } from "react";
 import {assets, cityList} from "../assets/assets"
+import { useAppContext } from "../context/AppContext";
 function Hero(){
     const [pickupLocation, setPickupLocation] = useState("");
+    const {axios, pickupDate, setPickupDate, returnDate, setReturnDate, navigate} = useAppContext();
+
+    function handleSearch(e){
+        e.preventDefault();
+        navigate('/cars?pickupLocation=' + pickupLocation + '&pickupDate=' + pickupDate + '&returnDate=' + returnDate)
+    }
+
     return(
         <div className="h-screen flex flex-col items-center justify-center gap-14
         bg-light text-center">
             <h1 className="text-4xl md:text-5xl font-semibold">Luxury cars on rent</h1>
 
-            <form action="" className="flex flex-col md:flex-row items-start md:items-center
+            <form onSubmit={handleSearch} action="" className="flex flex-col md:flex-row items-start md:items-center
             justify-between p-6 rounded-lg md:rounded-full w-full max-w-80 md:max-w-200
             bg-white shadow-[0px_8px_20px_rgba(0,0,0,0,1)]">
                 <div className="flex flex-col md:flex-row items-start md:items-center
@@ -29,14 +37,14 @@ function Hero(){
                     {/* Pick up date */}
                     <div className="flex flex-col items-start gap-2">
                         <label htmlFor="pickup-date">Pick-Up data</label>
-                        <input type="date" name="" id="pickup-date" min={new Date().toISOString().split("T")[0]}
+                        <input type="date" name="" value={pickupDate} onChange={(e)=>setPickupDate(e.target.value)} id="pickup-date" min={new Date().toISOString().split("T")[0]}
                         className="text-sm text-gray-500" required/>
                     </div>
 
                     {/*return date*/}
                     <div className="flex flex-col items-start gap-2">
                         <label htmlFor="return-date">Return Date</label>
-                        <input type="date" name="" id="return-date"
+                        <input value={returnDate} onChange={(e)=>setReturnDate(e.target.value)} type="date" name="" id="return-date"
                         className="text-sm text-gray-500" required/>
                     </div>
                 </div>

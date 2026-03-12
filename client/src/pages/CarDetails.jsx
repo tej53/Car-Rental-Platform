@@ -2,20 +2,39 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { assets, dummyCarData } from "../assets/assets";
 import Loader from "../components/Loader";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 function CarDetails(){
     const {id} = useParams();
+    const {cars, axios, pickupDate, setPickupDate, returnDate, setReturnDate} = useAppContext()
     const navigate = useNavigate();
     const [car, setCar] = useState(null);
     const currency = import.meta.env.VITE_CURRENCY;
     
     async function handleSubmit(e){
         e.preventDefault();
+        try{
+            const {data} = await axios.post("/api/booking/create", {
+                car: car._id,
+                pickupDate,
+                returnDate
+            });
+            if(data.success){
+                toast.success(data.message);
+                navigate("/my-bookings");
+            } else {
+                toast.error(data.message);
+            }
+        } catch(error){
+            toast.error(error.message);
+        }
     }
 
+
     useEffect(()=>{
-        setCar(dummyCarData.find(car=> car._id == id))
-    },[id])
+        setCar(cars.find(c=>c._id == id))
+    },[cars, id])
 
     return car ? (
         <>
@@ -82,13 +101,15 @@ function CarDetails(){
                         <div className="flex flex-col gap-2">
                             <label htmlFor="pickup-date">Pickup Date</label>
                             <input type="date" className="border border-borderColor px-3 py-2
-                            rounded-lg" required id="pickup-date" min={new Date().toISOString().split("T")[0]}/>
+                            rounded-lg" required id="pickup-date" min={new Date().toISOString().split("T")[0]}
+                            value={pickupDate} onChange={(e)=>setPickupDate(e.target.value)}/>
                         </div>
 
                         <div className="flex flex-col gap-2">
                             <label htmlFor="return-date">Return Date</label>
                             <input type="date" className="border border-borderColor px-3 py-2
-                            rounded-lg" required id="return-date"/>
+                            rounded-lg" required id="return-date"
+                            value={returnDate} onChange={(e)=>setReturnDate(e.target.value)}/>
                         </div>
 
                         <button className="w-full bg-primary hover:bg-primary-dull

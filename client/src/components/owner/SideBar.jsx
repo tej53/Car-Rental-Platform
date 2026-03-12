@@ -1,15 +1,31 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { Form, NavLink, useLocation } from "react-router-dom";
 import { assets, dummyUserData, ownerMenuLinks } from "../../assets/assets";
 import { useState } from "react";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 function SideBar(){
-    const user = dummyUserData;
+    const {user, axios, fetchUser} = useAppContext();
     const location = useLocation();
     const [image, setImage] = useState("");
 
     async function updateImage(){
-        user.image = URL.createObjectURL(image);
-        setImage("");
+        try{
+            const formData = new FormData();
+            formData.append("image", image);
+
+            const {data} = await axios.post("/api/owner/update-image", formData);
+
+            if(data.success){
+                fetchUser();
+                toast.success(data.message);
+                setImage("");
+            }else{
+                toast.error(data.message);
+            }
+        }catch(error){
+            toast.error(error.message);
+        }
     }
 
     return (
@@ -18,7 +34,7 @@ function SideBar(){
             max-w-13 md:max-w-60 w-full border-r border-borderColor text-sm">
                 <div className="group relative">
                     <label htmlFor="image">
-                        <img src={image ? URL.createObjectURL(image) : user?.image || "https://imgd.aeplcdn.com/642x361/n/cw/ec/56291/toyota-fortuner-right-front-three-quarter35.jpeg?wm=1&q=75"} alt="" />
+                        <img src={image ? URL.createObjectURL(image) : user?.image || "https://imgd.aeplcdn.com/642x361/n/cw/ec/56291/toyota-fortuner-right-front-three-quarter35.jpeg?wm=1&q=75"} alt="" className="h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto"/>
                         <input type="file" id="image" accept="image/*" hidden onChange={(e)=>{
                             setImage(e.target.files[0])
                         }}/>
@@ -31,8 +47,9 @@ function SideBar(){
                     </label>
                 </div>
                 {image && (
-                    <button className="absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer">
-                    Save<img src={assets.check_icon} alt="" width={13} onClick={updateImage}/></button>
+                    <button className="absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer"
+                    onClick={updateImage}>
+                    Save<img src={assets.check_icon} alt="" width={13} /></button>
                 )}
                 <p className="mt-2 text-base max-md:hidden">{user?.name}</p>
                 <div className="w-full">

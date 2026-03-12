@@ -1,0 +1,22 @@
+JWT Token:
+JWT (JSON Web Token) is a secure token used for authentication between client and server.
+It contains three parts: header, payload, and signature.
+After login, the server generates a token and sends it to the client. The client sends this token with every request,
+and the server verifies it to allow access to protected resources.
+
+Why JWT is Used
+
+1️⃣ No need to login repeatedly
+User logs in once.
+
+2️⃣ Stateless authentication
+Server does not store sessions.
+
+3️⃣ Faster APIs
+JWT works very well for:
+React apps
+Mobile apps
+REST APIs
+
+
+
